@@ -28,8 +28,17 @@ def prepare_pdf_files(input_path, destination_folder):
         destination_path = os.path.join(destination_folder, sanitized_name)
 
         shutil.copy2(filepath, destination_path)
-        renamed_files[sanitized_name] = filepath
+        renamed_files[sanitized_name] = destination_path  # Store the full destination path
 
         print(f"[INFO] Copied and sanitized: {original_name} → {sanitized_name}")
 
     return renamed_files
+
+
+def get_output_folder_name(pdf_filename: str) -> str:
+    """
+    Derives the output folder name from a PDF filename.
+    Assumes the folder name is the filename without the '.pdf' extension.
+    """
+    return os.path.splitext(pdf_filename)[0]
+

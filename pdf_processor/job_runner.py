@@ -1,59 +1,41 @@
-import asyncio
 import os
 import subprocess
-import shutil
+from pdf_processor.file_utils import get_output_folder_name
 
-async def run_single_job(container_name, container_temp_dir, filename, original_path):
-    pdf_path = os.path.join(container_temp_dir, filename)
-    output_path = container_temp_dir
-
-    cmd = f"docker exec {container_name} bash -c './call_job.sh {pdf_path} {output_path}"
-
-    print(f"[INFO] Starting job: {filename}")
-    process = await asyncio.create_subprocess_shell(
-        cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.STDOUT,
-    )
-
-    while True:
-        line = await process.stdout.readline()
-        if line:
-            print(f"[{filename}] {line.decode().strip()}")
-        else:
-            break
-
-    await process.wait()
-
-    folder_name = os.path.splitext(filename)[0]
-    src_folder = os.path.join(container_temp_dir, folder_name)
-
-    print(f"[INFO] Copying result folder: {folder_name} → host")
-
-    if os.path.isfile(original_path):
-        base_output_dir = os.path.dirname(original_path)
-    else:
-        base_output_dir = original_path
-
-    local_result_path = os.path.join(base_output_dir, folder_name)
-
-    cmd_cp = f"docker cp {container_name}:{src_folder} {local_result_path}"
-    result = subprocess.run(cmd_cp, shell=True, capture_output=True, text=True)
-
-    if result.returncode == 0:
-        print(f"[SUCCESS] Result copied to: {local_result_path}")
-    else:
-        print(f"[ERROR] Failed to copy result folder for {filename}\n{result.stderr}")
-
-def run_jobs_async(container_name, container_temp_dir, renamed_files, original_input_path):
-    async def runner():
-        tasks = [
-            run_single_job(container_name, container_temp_dir, filename, original_input_path if os.path.isdir(original_input_path) else original_path)
-            for filename, original_path in renamed_files.items()
-        ]
-        await asyncio.gather(*tasks)
+def run_job_in_container(container_name: str, pdf_file: str, temp_dir: str):
+    output_folder = get_output_folder_name(pdf_file)
+    pdf_path = f"{temp_dir}/{pdf_file}"
+    print(f"[INFO] Starting job: {pdf_file}")
 
     try:
-        asyncio.run(runner())
-    except KeyboardInterrupt:
-        print("[INTERRUPTED] Job runner interrupted by user.")
+        # Run the job using subprocess
+
+        process = subprocess.run(
+            ["docker", "exec", container_name, "/bin/bash", "-c",
+            f"export PATH=\"/opt/mineru_venv/bin:$PATH\" && /call_job.sh \"{pdf_path}\" \"{temp_dir}\""],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True
+        )
+
+        if process.stdout:
+            print(f"[{pdf_file}] {process.stdout.strip()}")
+        if process.stderr:
+            print(f"[{pdf_file} - ERROR] {process.stderr.strip()}")
+
+    except subprocess.CalledProcessError as e:
+        print(f"[ERROR] Failed to process {pdf_file} (subprocess error): {e}")
+    except FileNotFoundError as e:
+        print(f"[ERROR] Failed to process {pdf_file} (file not found): {e}")
+    except Exception as e:
+        print(f"[ERROR] Failed to process {pdf_file}: {e}")
+
+
+def monitor_jobs(container_name: str, pdf_files: list[str], temp_dir: str, callback=None):
+    """
+    Run jobs one by one for all the PDF files in the list.
+    """
+    for pdf_file in pdf_files:
+        run_job_in_container(container_name, pdf_file, temp_dir)
+

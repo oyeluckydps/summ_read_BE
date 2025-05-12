@@ -1,38 +1,43 @@
 import subprocess
-import time
 import os
+import shutil
 
-def run_command(command, capture_output=False):
+def run_command(cmd, capture_output=False):
+    """Executes a shell command and optionally captures output."""
     try:
-        result = subprocess.run(
-            command,
-            shell=True,
-            check=True,
-            capture_output=capture_output,
-            text=True
-        )
-        return result.stdout if capture_output else None
+        result = subprocess.run(cmd, shell=True, check=True, capture_output=capture_output, text=True)
+        if capture_output:
+            return result.stdout.strip()
     except subprocess.CalledProcessError as e:
-        print(f"[ERROR] Command failed: {command}\n{e}")
-        return None
+        print(f"[ERROR] Command failed: {cmd} - {e}")
+        raise
 
-def start_docker_container(container_name):
-    print("[INFO] Starting Docker container...")
-    cmd = (
-        f"docker run -dit --rm --gpus=all --name {container_name} "
-        "mineru:latest /bin/bash"
-    )
-    run_command(cmd)
-    time.sleep(2)
+def start_docker_container():
+    """Starts a Docker container and returns its name."""
 
-def create_temp_folder_in_container(container_name, folder_path):
-    cmd = f"docker exec {container_name} mkdir -p {folder_path}"
-    run_command(cmd)
+    container_name = f"mineru_{os.urandom(4).hex()}"
+    try:
+        run_command(f"docker run -d --gpus=all --name {container_name} mineru_mod:latest /bin/bash -c 'source ~/.bashrc; while true; do sleep 3600; done' \
+            ")
+        return container_name
+    except subprocess.CalledProcessError:
+        print("[ERROR] Failed to start Docker container.")
+        raise
 
-def copy_files_to_container(container_name, local_folder, container_folder):
-    cmd = f"docker cp {local_folder}/. {container_name}:{container_folder}/"
-    run_command(cmd)
+def stop_docker_container(container_name: str):
+    """Stops a Docker container."""
+    try:
+        run_command(f"docker stop {container_name}")
+    except subprocess.CalledProcessError:
+        print(f"[ERROR] Failed to stop Docker container: {container_name}")
+        raise
 
-def stop_docker_container(container_name):
-    cmd = f"docker stop {container_name}"
-    run_command(cmd)
+def copy_all_results_from_container(container_name: str, container_temp_dir: str, host_output_dir: str):
+    """Copies all output folders from the container's temp directory to the host."""
+    try:
+        run_command(f"docker cp {container_name}:{container_temp_dir}/. {host_output_dir}")
+        print(f"[INFO] Successfully copied all results from container to {host_output_dir}")
+    except subprocess.CalledProcessError as e:
+        print(f"[ERROR] Failed to copy results from container: {e}")
+        raise
+
