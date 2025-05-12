@@ -55,8 +55,9 @@ pdf_processor/
 To run the processor, execute:
 
 ```bash
-python main.py ../example_pdfs/
+python -m pdf_processor.main example_pdfs/single_page.pdf
 ```
+from the project folder - NOT THE MODULE folder.
 
 Where `../example_pdfs/` is a directory containing PDF files. The script will:
 

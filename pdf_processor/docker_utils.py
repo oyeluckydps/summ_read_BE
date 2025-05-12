@@ -17,8 +17,7 @@ def start_docker_container():
 
     container_name = f"mineru_{os.urandom(4).hex()}"
     try:
-        run_command(f"docker run -d --gpus=all --name {container_name} mineru_mod:latest /bin/bash -c 'source ~/.bashrc; while true; do sleep 3600; done' \
-            ")
+        run_command(f"docker run -d --gpus=all --name {container_name} mineru_mod:latest /bin/bash -c 'source ~/.bashrc; while true; do sleep 3600; done' ")
         return container_name
     except subprocess.CalledProcessError:
         print("[ERROR] Failed to start Docker container.")

@@ -48,12 +48,19 @@ def main(input_path):
     shutil.rmtree(temp_dir)
     print("[INFO] Temporary files cleaned up.")
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("[ERROR] Please provide the input path (file or folder).")
-        sys.exit(1)
-
-    input_path = sys.argv[1]
-    main(input_path)
-
+def run_from_command_line(args=None):
+    """Run the application from command line arguments."""
+    if args is None:
+        args = sys.argv
     
+    if len(args) != 2:
+        print("[ERROR] Please provide the input path (file or folder).")
+        return 1  # Exit code
+    
+    input_path = args[1]
+    main(input_path)
+    return 0  # Success
+
+if __name__ == "__main__":
+    sys.exit(run_from_command_line())
+
