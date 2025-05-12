@@ -37,9 +37,12 @@ def main(input_path):
     print("[INFO] Processing all jobs inside the container...")
     job_runner.monitor_jobs(container_name, pdf_files, container_temp_dir, None)  # No callback needed here
 
+    # Determine the output path based on input_path type
+    output_path = os.path.dirname(input_path) if os.path.isfile(input_path) else input_path
+    
     # Copy results back from the container
     print("[INFO] Copying results back from the container...")
-    docker_utils.copy_all_results_from_container(container_name, container_temp_dir, input_path)
+    docker_utils.copy_all_results_from_container(container_name, container_temp_dir, output_path)
 
     # Stop and remove the container
     docker_utils.stop_docker_container(container_name)
@@ -63,4 +66,3 @@ def run_from_command_line(args=None):
 
 if __name__ == "__main__":
     sys.exit(run_from_command_line())
-

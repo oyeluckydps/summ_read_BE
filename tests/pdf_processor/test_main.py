@@ -27,7 +27,8 @@ class TestMain(unittest.TestCase):
         # Test with a file path
         with patch('pdf_processor.main.os.path.isfile', return_value=True):
             with patch('pdf_processor.main.os.path.isdir', return_value=False):
-                main("/path/to/test.pdf")
+                with patch('pdf_processor.main.os.path.dirname', return_value="/path/to"):
+                    main("/path/to/test.pdf")
         
         # Verify function calls
         mock_makedirs.assert_called_once_with("temp_pdfs", exist_ok=True)
@@ -46,8 +47,9 @@ class TestMain(unittest.TestCase):
         )
         
         # Verify results copying and cleanup
+        # Key change: Now verify that parent directory (/path/to) is used instead of the file path
         mock_copy_results.assert_called_once_with(
-            "test_container", "/tmp/pdfs", "/path/to/test.pdf"
+            "test_container", "/tmp/pdfs", "/path/to"
         )
         mock_stop_container.assert_called_once_with("test_container")
         mock_rmtree.assert_called_once_with("temp_pdfs")
@@ -94,6 +96,7 @@ class TestMain(unittest.TestCase):
         self.assertIsNone(callback)
         
         # Verify cleanup
+        # For directories, the original directory path should still be used
         mock_copy_results.assert_called_once_with(
             "test_container", "/tmp/pdfs", "/path/to/pdf_dir"
         )
