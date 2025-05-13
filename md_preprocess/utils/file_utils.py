@@ -6,7 +6,7 @@ import os
 import uuid
 import shutil
 import difflib
-from typing import Optional
+from typing import Optional, List
 
 
 def copy_with_uuid(
@@ -86,3 +86,24 @@ def ensure_directory_exists(directory: str) -> None:
     """
     if not os.path.exists(directory):
         os.makedirs(directory, exist_ok=True)
+
+
+def clean_temp_files(directory: str, patterns: List[str]) -> None:
+    """
+    Remove temporary files matching given patterns from a directory.
+    
+    Args:
+        directory: Directory to clean
+        patterns: List of patterns to match filenames against
+    """
+    if not os.path.exists(directory) or not os.path.isdir(directory):
+        return
+        
+    try:
+        for filename in os.listdir(directory):
+            if any(pattern in filename for pattern in patterns):
+                file_path = os.path.join(directory, filename)
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+    except Exception as e:
+        print(f"Error cleaning temporary files: {str(e)}")

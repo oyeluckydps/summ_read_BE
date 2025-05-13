@@ -42,14 +42,9 @@ def execute_python_code(
     sys.stderr = stderr_capture = StringIO()
     
     try:
-        # Create a dictionary of local variables accessible to the executed code
-        local_vars = {
-            "input_file": input_file,
-            "output_file": output_file
-        }
-        
         # Execute the code
-        exec(code, {}, local_vars)
+        env = {}
+        exec(code, env, env)
         
         # Check if output file was created
         if not os.path.exists(output_file):

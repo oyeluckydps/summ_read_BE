@@ -5,3 +5,4 @@ node_modules/
 *.log
 temp_pdfs/
 temp_preprocess/
+.cache/

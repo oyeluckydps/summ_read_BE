@@ -29,8 +29,7 @@ def parse_arguments():
     
     parser.add_argument(
         "--output-dir", 
-        default="temp_preprocess",
-        help="Directory for output and temporary files (default: temp_preprocess)"
+        help="Directory for final output file (default: parent directory of input file)"
     )
     
     parser.add_argument(
@@ -88,12 +87,15 @@ def main():
             log_progress(f"API key for {args.llm} not provided", level="error")
             sys.exit(1)
     
+    # Use parent directory of input file as default output directory if not specified
+    output_dir = args.output_dir if args.output_dir else os.path.dirname(os.path.abspath(args.input_file))
+    
     # Initialize and run MDPreprocessManager
     start_time = time.time()
     
     manager = MDPreprocessManager(
         input_file=args.input_file,
-        output_dir=args.output_dir,
+        output_dir=output_dir,
         max_attempts=args.max_attempts,
         llm_name=args.llm,
         api_key=api_key,

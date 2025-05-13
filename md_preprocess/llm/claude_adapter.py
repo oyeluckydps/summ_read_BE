@@ -42,7 +42,7 @@ class ClaudeAdapter(BaseLLMAdapter):
             use_cache: Whether to cache responses
             cache_dir: Directory for response cache
         """
-        self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
+        self.api_key = api_key or os.environ.get("ANTHROPIC_SUMM_READ_KEY")
         if not self.api_key:
             raise ValueError("Anthropic API key is required")
         
@@ -76,13 +76,14 @@ class ClaudeAdapter(BaseLLMAdapter):
             Response from Claude
         """
         # Create a full system prompt that includes the file content
-        system_prompt = prompt
+        system_prompt = ''
         if file_content:
             # Truncate file content if too large (to avoid token limits)
             if len(file_content) > 300000:  # Arbitrary limit to avoid token issues
                 file_content = file_content[:150000] + "\n\n[...content truncated...]\n\n" + file_content[-150000:]
             
-            system_prompt += f"\n\nHere is the content of the input file:\n\n{file_content}"
+            system_prompt += f"Here is the content of the input MD file:\n\n{file_content}"
+            system_prompt += "\n\nEND OF CONTENT FOR THE MD FILE."
         
         # Check cache first if enabled
         if self.use_cache:
@@ -101,7 +102,7 @@ class ClaudeAdapter(BaseLLMAdapter):
                 temperature=self.temperature,
                 system=system_prompt,
                 messages=[
-                    {"role": "user", "content": "Generate Python code to preprocess this markdown file as described."}
+                    {"role": "user", "content": prompt}
                 ]
             )
             

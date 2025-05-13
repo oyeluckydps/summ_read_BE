@@ -24,6 +24,7 @@ You are an expert editor and Markdown document corrector. Please review the foll
     Ensure that all Markdown syntax is correct and renders properly (especially for images, equations, and code blocks).
 Now instead of directly writing back the md file, I would like you to write a simple python code that would make all the changes that you wish to make. Assume the the input file is {input_file} and the output from the Python code is {output_file}.
 Write the code to correct inaccuracies or shortcomings of only this specific file. Reply only with the Python code without any additional text or explanation.
+This code shall be executed using the exec() function in the Python interpreter so write the code in a way that doesn't use __main__.
 """
 
 ERROR_RETRY_PROMPT = """
