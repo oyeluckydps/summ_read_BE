@@ -110,7 +110,7 @@ class LLM1StepCode(BasePreprocessor):
         if "```python" in llm_response and "```" in llm_response:
             # Extract code between Python code blocks
             start_idx = llm_response.find("```python") + 9
-            end_idx = llm_response.find("```", start_idx)
+            end_idx = llm_response.rfind("```", start_idx)
             
             if start_idx >= 9 and end_idx > start_idx:
                 return llm_response[start_idx:end_idx].strip()

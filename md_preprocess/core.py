@@ -81,7 +81,7 @@ class MDPreprocessManager:
             llm_adapter = ClaudeAdapter(
                 api_key=self.api_key,
                 model="claude-3-7-sonnet-20250219",
-                use_cache=False     #self.config.get("use_cache", True)
+                use_cache=self.config.get("use_cache", True)
             )
         else:
             # Default to Claude

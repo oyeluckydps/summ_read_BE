@@ -75,19 +75,14 @@ class ClaudeAdapter(BaseLLMAdapter):
         Returns:
             Response from Claude
         """
-        # Create a full system prompt that includes the file content
-        system_prompt = ''
-        if file_content:
-            # Truncate file content if too large (to avoid token limits)
-            if len(file_content) > 300000:  # Arbitrary limit to avoid token issues
-                file_content = file_content[:150000] + "\n\n[...content truncated...]\n\n" + file_content[-150000:]
-            
-            system_prompt += f"Here is the content of the input MD file:\n\n{file_content}"
-            system_prompt += "\n\nEND OF CONTENT FOR THE MD FILE."
+
+        prompt_combined = f"Here is the content of the input MD file:\n\nBEGINNING OF THE CONTENT OF THE MD FILE.\n\n{file_content}"
+        prompt_combined += "\n\nEND OF CONTENT OF THE MD FILE.\n\n"
+        prompt_combined += prompt
         
         # Check cache first if enabled
         if self.use_cache:
-            cache_key = self._get_cache_key(system_prompt)
+            cache_key = self._get_cache_key(prompt)
             cached_response = self._get_cached_response(cache_key)
             if cached_response:
                 log_progress("Using cached LLM response")
@@ -100,7 +95,7 @@ class ClaudeAdapter(BaseLLMAdapter):
                 model=self.model,
                 max_tokens=self.max_tokens,
                 temperature=self.temperature,
-                system=system_prompt,
+                system='',
                 messages=[
                     {"role": "user", "content": prompt}
                 ]
