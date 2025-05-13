@@ -6,9 +6,8 @@
       "type": "python",
       "request": "launch",
       "module": "md_preprocess.cli",
-      "args": ["example_pdfs/50_23_READ_Learning_in_the_Machine_To_share_or_not_to_share/auto/50_23_READ_Learning_in_the_Machine_To_share_or_not_to_share.md"],
+      "args": ["example_pdfs/single_page/auto/single_page.md"],
       "console": "integratedTerminal",
-      "python": "/root/anaconda3/bin/python",
       "cwd": "/root/Abhinav/projects/summ_read/summ_read_BE"
     }
   ]

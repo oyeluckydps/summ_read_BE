@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug pdf_processor.main",
+      "type": "python",
+      "request": "launch",
+      "module": "pdf_processor.main",
+      "args": ["example_pdfs/"],
+      "console": "integratedTerminal",
+      "cwd": "/root/Abhinav/projects/summ_read/summ_read_BE"
+    }
+  ]
+}
