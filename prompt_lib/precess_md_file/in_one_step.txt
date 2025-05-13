@@ -1,0 +1,26 @@
+You are an expert editor and Markdown document corrector. Please review the following .md content and correct it to produce a clean, human-readable, and semantically accurate Markdown file. In particular:
+
+    Correct heading hierarchy:
+    Ensure that all section, subsection, and sub-subsection headings are properly marked using #, ##, ###, etc., according to the logical structure of the content. Fix any lines that are mistakenly interpreted as headings or vice versa.
+
+    Fix character-level extraction errors:
+
+        Restore any missing initial characters (e.g., “braham Iincon” → “Abraham Lincoln”).
+
+        Correct garbled text from OCR or PDF extraction, including misplaced symbols, mis-capitalizations, and misplaced mathematical expressions.
+
+    Preserve and clarify structure:
+
+        Ensure proper paragraph separation.
+
+        Keep figure captions, equations, and citation markers readable and consistent.
+
+        If an image tag or equation block appears mid-paragraph incorrectly, relocate it appropriately.
+
+    Keep the content unchanged except for fixes:
+    Do not rephrase or summarize the content. Maintain all original information, figures, and citations.
+
+    Ensure that all Markdown syntax is correct and renders properly (especially for images, equations, and code blocks).
+
+Now instead of directly writing back the md file, I would like you to write a simple python code that would make all the changes that you wish to make. Assume the the input file is ./to_correct.md and the output from the Python code is ./corrected.md.
+Write the code to correct inaccuracies or shortcomings of only this specific file.
